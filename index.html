@@ -18,7 +18,7 @@
 
   <div class="container">
 
-    
+
     <div id="gifs-view"></div>
 
     <form id="gif-form">
@@ -30,14 +30,14 @@
     </form>
 
     <div id="gifs-appear-here">
-      </div>
+    </div>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
     <script type="text/javascript">
-     
+
       var gifs = ["Aragorn", "Legolas", "Gandalf", "Gimli"];
 
-      
+
       function renderButtons() {
 
         $("#gifs-view").empty();
@@ -52,13 +52,13 @@
         }
       }
 
-      
-      $("#add-gif").on("click", function(event) {
-        
+
+      $("#add-gif").on("click", function (event) {
+
         event.preventDefault();
 
         var newGif = $("#gif-input").val().trim();
-        
+
         gifs.push(newGif);
 
         renderButtons();
@@ -70,49 +70,68 @@
 
       });
 
-      $(document).on("click", ".gif", function() {
+      $(document).on("click", ".gif", function () {
         console.log(this);
         var character = $(this).attr("data-name");
         console.log(character);
-      
 
 
-    //   // USE THIS FOR HW!
-      var queryURL = "https://api.giphy.com/v1/gifs/search?q=" +
-        character + "&api_key=dc6zaTOxFJmzC";
-      // USE THIS FOR HW!
 
-      $.ajax({
-        url: queryURL,
-        method: "GET"
-      })
-        .then(function(response) {
-          // can console log repsonse here to make sure grabbing right object
-          console.log(response);
-          // storing response.data in results variable
-          // turns results into an object
-          var results = response.data;
+        //   // USE THIS FOR HW!
+        var queryURL = "https://api.giphy.com/v1/gifs/search?q=" +
+          character + "&api_key=dc6zaTOxFJmzC";
+        // USE THIS FOR HW!
 
-          for (var i = 0; i < results.length; i++) {
-            var gifDiv = $("<div>");
+        $.ajax({
+          url: queryURL,
+          method: "GET"
+        })
+          .then(function (response) {
+            // can console log repsonse here to make sure grabbing right object
+            console.log(response);
+            // storing response.data in results variable
+            // turns results into an object
+            var results = response.data;
 
-            var rating = results[i].rating;
+            for (var i = 0; i < results.length; i++) {
+              var gifDiv = $("<div>");
 
-            var p = $("<p>").text("Rating: " + rating);
+              var rating = results[i].rating;
 
-            var charGif = $("<img>");
-            charGif.attr("src", results[i].images.fixed_height.url);
+              var p = $("<p>").text("Rating: " + rating);
 
-            gifDiv.prepend(p);
-            gifDiv.prepend(charGif);
+              var charGif = $("<img>");
+              charGif.attr("src", results[i].images.fixed_height_still.url);
+              charGif.attr("data-still", results[i].images.fixed_height_still.url);
+              charGif.attr("data-animate", results[i].images.fixed_height.url);
+              charGif.attr("data-state", "still");
+              charGif.addClass("gif-image");
 
-            $("#gifs-appear-here").prepend(gifDiv);
-          }
-        });
+              gifDiv.prepend(p);
+              gifDiv.prepend(charGif);
+
+              $("#gifs-appear-here").prepend(gifDiv);
+            }
+          });
       });
 
-      
+
       renderButtons();
+
+      $(document).on("click", ".gif-image", function () {
+        // The attr jQuery method allows us to get or set the value of any attribute on our HTML element
+        var state = $(this).attr("data-state");
+        // If the clicked image's state is still, update its src attribute to what its data-animate value is.
+        // Then, set the image's data-state to animate
+        // Else set src to the data-still value
+        if (state === "still") {
+          $(this).attr("src", $(this).attr("data-animate"));
+          $(this).attr("data-state", "animate");
+        } else {
+          $(this).attr("src", $(this).attr("data-still"));
+          $(this).attr("data-state", "still");
+        }
+      });
     </script>
   </div>
 </body>
